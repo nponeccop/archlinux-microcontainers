@@ -1,6 +1,8 @@
 FROM nponeccop/archlinux-microcontainers AS tmp-builder
 ENV LANG=en_US.UTF-8
 ENV HOSTTYPE=i686
+RUN ln -s /usr/share/zoneinfo/UTC /etc/localtime
+RUN echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen
 RUN setarch i686 pacman --noconfirm -Suy --needed npm strace rsync systemd && rm /var/cache/pacman/pkg/*.pkg.tar.xz
 RUN useradd -m app
 ADD . /home/app
@@ -8,15 +10,14 @@ ADD . /home/app
 WORKDIR /home/app
 USER app
 RUN setarch i686 npm install
-RUN setarch i686 timeout 5 strace -o app.trace -s 65536 -e trace=openat,execve -e signal=none -fyqq node app.js || true
-RUN ./strace-spec.sh app.trace /
+RUN setarch i686 smith-strace/default-trace.sh node app
+
 USER root
-RUN mkdir /rootfs
-RUN rsync -alv / /rootfs --files-from=app.spec
-RUN ls /rootfs/home -l
- 
+RUN setarch i686 smith-strace/default-mkrootfs.sh
+
 FROM scratch
 COPY --from=tmp-builder rootfs /
+USER 1000
 WORKDIR /home/app
 ENTRYPOINT '/usr/bin/node'
-CMD [ '/home/app/app' ]
+CMD [ 'app' ]
