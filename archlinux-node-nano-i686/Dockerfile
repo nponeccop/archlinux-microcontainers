@@ -9,9 +9,7 @@ USER app
 RUN setarch i686 npm install
 RUN setarch i686 timeout 5 strace -o app.trace -s 65536 -e trace=openat,execve -e signal=none -fyqq node app.js || true
 RUN cat app.trace | grep -v ENOENT
-RUN ./strace-parse.sh app.trace >app.parsed
 RUN ./strace-spec.sh app.parsed / >app.spec
-
 USER root
 RUN mkdir /rootfs
 RUN rsync -alv / /rootfs --files-from=app.spec
