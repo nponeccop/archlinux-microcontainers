@@ -1,7 +1,7 @@
 FROM nponeccop/archlinux-microcontainers AS tmp-builder
 ENV LANG=en_US.UTF-8
 ENV HOSTTYPE=i686
-RUN setarch i686 pacman --noconfirm -Suy --needed npm strace rsync && rm /var/cache/pacman/pkg/*.pkg.tar.xz && pacman -Scc --noconfirm
+RUN setarch i686 pacman --noconfirm -Suy --needed npm strace rsync systemd && rm /var/cache/pacman/pkg/*.pkg.tar.xz && pacman -Scc --noconfirm
 RUN useradd -m app
 ADD . /home/app
 WORKDIR /home/app
