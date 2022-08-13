@@ -1,0 +1,23 @@
+FROM rockylinux:8 AS tmp-builder
+RUN yum install -y epel-release
+RUN yum -y module enable nodejs:14
+RUN yum -y install nodejs gearmand strace which rsync findutils
+
+RUN useradd -m app
+WORKDIR /home/app
+USER app
+
+RUN npm config set prefix ~/.local
+RUN npm i -g yarn
+
+ADD . /home/app
+
+RUN bash -lc yarn install --frozen-lockfile
+RUN smith-strace/default-trace.sh $(which node) app.js
+
+USER root
+RUN smith-strace/default-mkrootfs.sh
+RUN tar --numeric-owner -C /rootfs -cvf rootfs.tar .
+
+FROM scratch
+COPY --from=tmp-builder /home/app/rootfs.tar /

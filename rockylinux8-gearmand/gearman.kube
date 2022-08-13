@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gearman-pod
+spec:
+  hostNetwork: true
+  restartPolicy: always
+  containers:
+  - image: localhost/small:latest
+    name: gearman
+  - image: localhost/small-node:latest
+    name: node

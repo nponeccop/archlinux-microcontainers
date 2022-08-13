@@ -1,0 +1,8 @@
+{
+  "license": "MIT",
+  "description": "test app",
+  "repository": "private",
+  "dependencies": {
+    "express": "*"
+  }
+}

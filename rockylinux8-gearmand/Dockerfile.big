@@ -1,0 +1,10 @@
+FROM rockylinux:8
+RUN yum install -y epel-release
+RUN yum install -y gearmand
+RUN useradd -m app
+ADD . /home/app
+
+WORKDIR /home/app
+USER app
+EXPOSE 4730
+ENTRYPOINT [ "/usr/sbin/gearmand", "--syslog", "--log-file", "stderr" ]

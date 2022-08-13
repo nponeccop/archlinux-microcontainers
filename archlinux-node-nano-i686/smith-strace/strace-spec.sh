@@ -22,7 +22,7 @@ function grep_nosys {
 node $DIR/dir-links.js <(
 	(
 	cat $TRACEFILE | strace_parse 
-	find -L /lib -maxdepth 1 -name 'libnss_files.so*' -or -name 'libnss_dns.so*' -or -name 'ld-linux.so*' -or -name 'libresolv.so*'
+	find -L /lib /lib64 -maxdepth 1 -name 'libnss_files.so*' -or -name 'libnss_dns.so*' -or -name 'ld-linux*.so*' -or -name 'libresolv.so*'
 	find -L /etc -maxdepth 1 -name 'hosts'
 	) | grep_nosys
 ) $ROOT | grep_nosys
@@ -34,12 +34,9 @@ cat <<bar
 /tmp
 /proc
 /etc/resolv.conf
-/lib
+/etc/passwd
 /mnt
-/sbin
-/usr/sbin
 /srv
 /opt
-/bin
 bar
 ) | sort -u >app.spec
