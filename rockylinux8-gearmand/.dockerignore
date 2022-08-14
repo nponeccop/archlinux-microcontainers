@@ -1,0 +1,7 @@
+Dockerfile*
+rootfs.tar
+build.sh
+*.kube
+*.swp
+smith-strace/*.swp
+.dockerignore
