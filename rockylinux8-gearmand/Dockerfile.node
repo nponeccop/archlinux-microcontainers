@@ -13,11 +13,16 @@ RUN npm i -g yarn
 ADD . /home/app
 
 RUN bash -lc yarn install --frozen-lockfile
+
+# Uses strace to produce app.trace
 RUN smith-strace/default-trace.sh $(which tini) $(which node) app.js
 
-USER root
-RUN smith-strace/default-mkrootfs.sh
-RUN tar --numeric-owner -C /rootfs -cvf rootfs.tar .
+# Uses app.trace, nodejs and findutils to produce app.spec
+# Doesn't require root privileges
+RUN smith-strace/strace-spec.sh app.trace /
 
-FROM scratch
-COPY --from=tmp-builder /home/app/rootfs.tar /
+USER root
+# Uses tar and rsync to produce rootfs.tar.
+# Requires root privileges
+RUN smith-strace/default-mkrootfs.sh
+
